@@ -3,7 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors({origin:"https://jomange-pos.vercel.app/"}));
+app.use(cors({origin:"https://jomange-pos.vercel.app", credentials: true}));
 app.use(express.json());
 
 // Routes
