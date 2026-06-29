@@ -1,38 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../../services/api";
 
-export default function Sales() {
-  const [productId, setProductId] = useState("");
-  const [quantity, setQuantity] = useState("");
+export default function SalesForm() {
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [quantity, setQuantity] = useState(1);
 
-  const handleSale = async (e) => {
+  useEffect(() => {
+    API.get("/products").then(res => setProducts(res.data));
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await API.post("/sales", { productId, quantity });
-      alert(`Sale recorded: KES ${res.data.amount}`);
-    } catch (err) {
-      alert("Error: " + (err.response?.data?.error || err.message));
-    }
+    await API.post("/sales", {
+      product_id: selectedProduct,
+      quantity: quantity
+    });
+    alert("Sale recorded successfully!");
   };
 
   return (
-    <div>
-      <h2>Sales</h2>
-      <form onSubmit={handleSale}>
-        <input
-          type="text"
-          placeholder="Product ID"
-          value={productId}
-          onChange={(e) => setProductId(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-        />
-        <button type="submit">Record Sale</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>Product:</label>
+      <select
+        value={selectedProduct}
+        onChange={(e) => setSelectedProduct(e.target.value)}
+        required
+      >
+        <option value="">-- Select Product --</option>
+        {products.map(p => (
+          <option key={p.id} value={p.id}>
+            {p.name}
+          </option>
+        ))}
+      </select>
+
+      <label>Quantity:</label>
+      <input
+        type="number"
+        value={quantity}
+        min="1"
+        onChange={(e) => setQuantity(e.target.value)}
+        required
+      />
+
+      <button type="submit">Record Sale</button>
+    </form>
   );
 }

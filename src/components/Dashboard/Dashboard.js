@@ -1,64 +1,104 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
-import { Line } from "react-chartjs-2";
-import "chart.js/auto";
 
 export default function Dashboard() {
-  const [summary, setSummary] = useState({ revenue: 0, items_sold: 0 });
-  const [daily, setDaily] = useState([]);
-  const [cash, setCash] = useState(0);
-  const [lowStock, setLowStock] = useState([]);
-  const [audit, setAudit] = useState([]);
+  const [inventory, setInventory] = useState({ totalProducts: 0, totalStock: 0, lowStock: [] });
+  const [activity, setActivity] = useState([]);
+  const [sales, setSales] = useState({ revenue: 0, items: 0 });
 
   useEffect(() => {
-    API.get("/reports/alltime").then(res => setSummary(res.data));
-    API.get("/reports/daily").then(res => setDaily(res.data));
-    API.get("/reports/cashbalance").then(res => setCash(res.data.balance));
-    API.get("/products").then(res => setLowStock(res.data.filter(p => p.stock < 5)));
-    API.get("/audit").then(res => setAudit(res.data.slice(0,5)));
+    API.get("/reports/inventorysummary").then(res => setInventory(res.data));
+    API.get("/audit").then(res => setActivity(res.data.slice(0,5)));
+    API.get("/reports/today").then(res => setSales(res.data));
   }, []);
-
-  const chartData = {
-    labels: daily.map(d => d.day),
-    datasets: [
-      {
-        label: "Daily Sales (KES)",
-        data: daily.map(d => d.revenue),
-        borderColor: "#4CAF50",
-        backgroundColor: "rgba(76, 175, 80, 0.2)",
-        fill: true,
-      },
-    ],
-  };
 
   return (
     <div className="dashboard">
       <h2>POS Dashboard</h2>
-      <div className="cards">
-        <div className="card">Total Revenue: KES {summary.revenue}</div>
-        <div className="card">Items Sold: {summary.items_sold}</div>
-        <div className="card">Cash Balance: KES {cash}</div>
-      </div>
 
-      <div className="chart">
-        <Line data={chartData} />
-      </div>
+      {/* Inventory Summary */}
+      <h3>Inventory Summary</h3>
+      <table className="styled-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Total Products</td>
+            <td>{inventory.totalProducts}</td>
+          </tr>
+          <tr>
+            <td>Total Stock Units</td>
+            <td>{inventory.totalStock}</td>
+          </tr>
+        </tbody>
+      </table>
 
+      {/* Low Stock Alerts */}
       <h3>Low Stock Alerts</h3>
-      <ul>
-        {lowStock.map(p => (
-          <li key={p.id}>{p.name} — Stock: {p.stock}</li>
-        ))}
-      </ul>
+      <table className="styled-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {inventory.lowStock.map(p => (
+            <tr key={p.id}>
+              <td>{p.name}</td>
+              <td>{p.stock}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-      <h3>Recent Audit Logs</h3>
-      <ul>
-        {audit.map(a => (
-          <li key={a.id}>
-            [{new Date(a.createdat).toLocaleString()}] {a.username} — {a.action}: {a.details}
-          </li>
-        ))}
-      </ul>
+      {/* Today’s Sales Snapshot */}
+      <h3>Today’s Sales Snapshot</h3>
+      <table className="styled-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Revenue</td>
+            <td>KES {sales.revenue}</td>
+          </tr>
+          <tr>
+            <td>Items Sold</td>
+            <td>{sales.items}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {/* Recent Activity */}
+      <h3>Recent Activity</h3>
+      <table className="styled-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {activity.map(a => (
+            <tr key={a.id}>
+              <td>{new Date(a.createdat).toLocaleString()}</td>
+              <td>{a.username}</td>
+              <td>{a.action}</td>
+              <td>{a.details}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
