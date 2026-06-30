@@ -13,8 +13,8 @@ export default function SalesForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await API.post("/sales", {
-      product_id: selectedProduct,
-      quantity: quantity
+      productId: parseInt(selectedProduct),
+      quantity: parseInt(quantity)
     });
     alert("Sale recorded successfully!");
   };

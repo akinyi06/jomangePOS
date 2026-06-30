@@ -2,24 +2,32 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
-const authenticateToken = require("../middleware/auth");
 
-router.get("/daily", authenticateToken, async (req, res) => {
-  const result = await pool.query(
-    "SELECT DATE(createdAt) as day, SUM(amount) as revenue FROM sales GROUP BY day ORDER BY day DESC LIMIT 7"
-  );
-  res.json(result.rows);
+// Inventory summary
+router.get("/inventorysummary", async (req, res) => {
+  try {
+    const productsRes = await pool.query("SELECT * FROM products");
+    const products = productsRes.rows;
+    const totalProducts = products.length;
+    const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
+    const lowStock = products.filter(p => p.stock < 5);
+    res.json({ totalProducts, totalStock, lowStock });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch inventory summary" });
+  }
 });
 
-router.get("/alltime", authenticateToken, async (req, res) => {
-  const result = await pool.query("SELECT SUM(amount) as revenue, SUM(quantity) as items_sold FROM sales");
-  res.json(result.rows[0]);
-});
-
-router.get("/cashbalance", authenticateToken, async (req, res) => {
-  const income = await pool.query("SELECT SUM(amount) as total FROM cash WHERE type='income'");
-  const expense = await pool.query("SELECT SUM(amount) as total FROM cash WHERE type='expense'");
-  res.json({ balance: (income.rows[0].total || 0) - (expense.rows[0].total || 0) });
+// Today’s sales snapshot
+router.get("/today", async (req, res) => {
+  try {
+    const salesRes = await pool.query("SELECT * FROM sales WHERE createdAt::date = CURRENT_DATE");
+    const sales = salesRes.rows;
+    const revenue = sales.reduce((sum, s) => sum + parseFloat(s.amount), 0);
+    const items = sales.reduce((sum, s) => sum + s.quantity, 0);
+    res.json({ revenue, items });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch today’s sales" });
+  }
 });
 
 module.exports = router;

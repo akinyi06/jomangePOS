@@ -14,6 +14,7 @@ const reportsRouter = require("./routes/reports");
 const inventoryRouter=require("./routes/inventory");
 const usersRouter= require("./routes/users");
 const auditRouter=require("./routes/audit");
+const cashRouter=require("./routes/cash");
 
 
 
@@ -23,7 +24,8 @@ app.use("/sales", salesRouter);
 app.use("/reports", reportsRouter);
 app.use("/users", usersRouter);
 app.use("/audit", auditRouter);
-
+app.use("/cash", cashRouter);
+app.use("/inventory", inventoryRouter);
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import API from "../../services/api";
+import { type } from "@testing-library/user-event/dist/type";
 
 export default function Inventory() {
   const [movements, setMovements] = useState([]);
@@ -25,15 +26,19 @@ export default function Inventory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/inventory", form);
-      alert("Inventory movement recorded!");
-      const res = await API.get("/inventory");
-      setMovements(res.data);
-    } catch (err) {
-      alert("Error: " + (err.response?.data?.error || err.message));
-    }
-  };
-
+      await API.post("/inventory", {
+        productId:parseInt(form.productId),
+        type:form.type.toUpperCase(),
+        quantity:parseInt(form.quantity),
+        remarks:form.remarks
+      });
+      alert("Inventory Movement Recorded!");
+      const res =await API.get("/inventory");
+      setMovements(res.data);}
+      catch(err){
+        alert("Error:"+(err.response?.data.error||err.message));
+      }
+      };
   return (
     <div>
       <h2>Inventory Movements</h2>

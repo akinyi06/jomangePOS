@@ -7,7 +7,7 @@ const authenticateToken = require("../middleware/auth");
 // CREATE cash transaction
 router.post("/", authenticateToken, async (req, res) => {
   const { type, amount, remarks } = req.body;
-  const username = req.user.username;
+ const username = req.user.username;
 
   try {
     if (!["income", "expense"].includes(type.toLowerCase())) {

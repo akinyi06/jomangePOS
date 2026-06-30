@@ -6,7 +6,7 @@ export default function Topbar() {
 
   return (
     <div className="topbar">
-      <span>Welcome, {auth?.username}</span>
+      <span>Jomange Store {auth?.username}</span>
       <button onClick={logout}>Logout</button>
     </div>
   );
