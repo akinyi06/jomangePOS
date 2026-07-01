@@ -45,5 +45,30 @@ router.get("/", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch cash transactions" });
   }
 });
+// Get cash summary (today’s revenue)
+router.get("/summary", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+         SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS total_income,
+         SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS total_expense
+       FROM cash
+       WHERE createdAt::date = CURRENT_DATE`
+    );
+
+    const { total_income, total_expense } = result.rows[0];
+    const revenue = (total_income || 0) - (total_expense || 0);
+
+    res.json({
+      revenue,
+      income: total_income || 0,
+      expense: total_expense || 0
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch cash summary" });
+  }
+});
+
 
 module.exports = router;

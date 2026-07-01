@@ -44,13 +44,25 @@ export default function Users() {
         <button type="submit">Create User</button>
       </form>
 
-      <ul>
-        {users.map((u) => (
-          <li key={u.id}>
-            {u.username} — Role: {u.role} — Active: {u.active ? "Yes" : "No"}
-          </li>
-        ))}
-      </ul>
+      <table className="styled-table">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Role</th>
+      <th>Active</th>
+    </tr>
+  </thead>
+  <tbody>
+    {users.map((u) => (
+      <tr key={u.id}>
+        <td>{u.username}</td>
+        <td>{u.role}</td>
+        <td>{u.active ? "Yes" : "No"}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   );
 }

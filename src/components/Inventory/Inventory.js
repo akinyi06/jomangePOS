@@ -53,13 +53,30 @@ export default function Inventory() {
         <button type="submit">Record Movement</button>
       </form>
 
-      <ul>
-        {movements.map((m) => (
-          <li key={m.id}>
-            {m.type} {m.quantity} units of {m.productname} — {m.remarks}
-          </li>
-        ))}
-      </ul>
+      <table className="styled-table">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Remarks</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {movements.map((m) => (
+      <tr key={m.id}>
+        <td>{m.productname}</td>
+        <td className={m.type==="REMOVE"?"low-stock": ""}>{m.type}
+        </td>
+        <td>{m.quantity}</td>
+        <td>{m.remarks}</td>
+        <td>{new Date(m.createdat).toLocaleString()}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   );
 }

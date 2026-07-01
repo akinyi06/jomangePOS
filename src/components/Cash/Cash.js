@@ -57,13 +57,29 @@ export default function Cash() {
         <button type="submit">Record Transaction</button>
       </form>
 
-      <ul>
-        {transactions.map((t) => (
-          <li key={t.id}>
-            {t.type.toUpperCase()} — KES {t.amount} ({t.remarks})
-          </li>
-        ))}
-      </ul>
+      <table className="styled-table">
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Remarks</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {transactions.map((t) => (
+      <tr key={t.id}>
+        <td className={t.type==="expense"?"expense": "income"}>
+          {t.type.toUpperCase()}
+        </td>
+        <td>KES {t.amount}</td>
+        <td>{t.remarks}</td>
+        <td>{new Date(t.createdat).toLocaleString()}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   );
 }

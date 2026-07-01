@@ -154,7 +154,19 @@ body {
 .styled-table tbody tr:nth-child(even) {
   background-color: #f3f3f3;
 }
+/* Conditional styling */
+.low-stock {
+  color: #d9534f; /* subtle red */
+  font-weight: bold;
+}
 
+.expense {
+  color: #6c757d; /* muted gray */
+}
+
+.income {
+  color: #28a745; /* subtle green */
+}
 
 /* Forms */
 form {

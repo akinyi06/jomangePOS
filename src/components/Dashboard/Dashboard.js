@@ -10,8 +10,11 @@ export default function Dashboard() {
     API.get("/reports/inventorysummary").then(res => setInventory(res.data));
     API.get("/audit").then(res => setActivity(res.data.slice(0,5)));
     API.get("/reports/today").then(res => setSales(res.data));
+    API.get("/cash/summary").then(res=>{
+      setSales(prev=>({...prev,revenue:res.data.revenue}));
+    });
   }, []);
-
+//2550 
   return (
     <div className="dashboard">
       <h2>POS Dashboard</h2>

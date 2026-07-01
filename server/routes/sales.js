@@ -1,9 +1,9 @@
-// routes/sales.js
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 const authenticateToken = require("../middleware/auth");
 
+// Record a new sale
 router.post("/", authenticateToken, async (req, res) => {
   const { productId, quantity } = req.body;
   const username = req.user.username;
@@ -19,9 +19,8 @@ router.post("/", authenticateToken, async (req, res) => {
 
     // 2. Validate stock
     if (product.stock < quantity) {
-      return res.status(400).json({ error: 'Insufficient stock. Only ${product.stock} units available.' });
+      return res.status(400).json({ error: `Insufficient stock. Only ${product.stock} units available.` });
     }
-    
 
     // 3. Calculate amount in KES
     const amount = product.sellingprice * quantity;
@@ -29,7 +28,7 @@ router.post("/", authenticateToken, async (req, res) => {
     // 4. Deduct stock
     await pool.query("UPDATE products SET stock = stock - $1 WHERE id=$2", [quantity, productId]);
 
-    // 5. Insert sale (schema uses productId + productName)
+    // 5. Insert sale record
     const saleRes = await pool.query(
       "INSERT INTO sales (productId, productName, quantity, amount) VALUES ($1,$2,$3,$4) RETURNING *",
       [productId, product.name, quantity, amount]
@@ -52,6 +51,17 @@ router.post("/", authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to record sale" });
+  }
+});
+
+//New: Get all sales records
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM sales ORDER BY createdAt DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch sales records" });
   }
 });
 

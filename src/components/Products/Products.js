@@ -50,13 +50,33 @@ export default function Products() {
         <button type="submit">Add Product</button>
       </form>
 
-      <ul>
-        {products.map((p) => (
-          <li key={p.id}>
-            {p.name} ({p.category}) — Stock: {p.stock}, Selling: KES {p.sellingprice}
-          </li>
-        ))}
-      </ul>
+      <table className="styled-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Unit</th>
+      <th>Stock</th>
+      <th>Buying Price</th>
+      <th>Selling Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {products.map((p) => (
+      <tr key={p.id}>
+        <td>{p.name}</td>
+        <td>{p.category}</td>
+        <td>{p.unit}</td>
+        <td className={p.stock<5?"low-stock":""}>
+          {p.stock}
+        </td>
+        <td>KES {p.buyingprice}</td>
+        <td>KES {p.sellingprice}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   );
 }

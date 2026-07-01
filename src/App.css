@@ -7,11 +7,31 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Global mobile adjustments */
+@media (max-width: 768px) {
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  input, select, button {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  .styled-table {
+    display: block;
+    overflow-x: auto; /* horizontal scroll for tables */
+    white-space: nowrap;
+  }
+
+  .styled-table th, .styled-table td {
+    padding: 12px;
   }
 }
+
 
 .App-header {
   background-color: #282c34;
